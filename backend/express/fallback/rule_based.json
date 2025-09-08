@@ -1,0 +1,22 @@
+{
+  "monsoon": [
+    { "label": "rice", "score": 0.7 },
+    { "label": "maize", "score": 0.2 },
+    { "label": "cotton", "score": 0.1 }
+  ],
+  "winter": [
+    { "label": "wheat", "score": 0.6 },
+    { "label": "barley", "score": 0.25 },
+    { "label": "gram", "score": 0.15 }
+  ],
+  "spring": [
+    { "label": "gram", "score": 0.5 },
+    { "label": "maize", "score": 0.3 },
+    { "label": "cotton", "score": 0.2 }
+  ],
+  "default": [
+    { "label": "wheat", "score": 0.34 },
+    { "label": "rice", "score": 0.33 },
+    { "label": "maize", "score": 0.33 }
+  ]
+}
