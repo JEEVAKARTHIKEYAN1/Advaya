@@ -1,3 +1,90 @@
+## AgriMitra AI - Crop Recommendation Microservice and Backend Integration
+
+### Quick Start
+
+1) Train model
+
+```bash
+python /workspace/ml_service/train_xgb.py --data /workspace/data/sample_crops.csv --out /workspace/ml_service/artifacts
+```
+
+2) Run FastAPI service (locally)
+
+```bash
+pip install -r /workspace/ml_service/requirements.txt
+uvicorn ml_service.app:app --host 0.0.0.0 --port 8000
+```
+
+3) Dockerize and run
+
+```bash
+docker build -t agri-ml -f /workspace/ml_service/Dockerfile / 
+&& docker run -e ARTIFACT_DIR=/workspace/ml_service/artifacts -p 8000:8000 agri-ml
+```
+
+4) Predict
+
+```bash
+curl -X POST http://localhost:8000/predict -H 'Content-Type: application/json' -d '{
+  "N":40,"P":20,"K":20,"temperature":26,"humidity":65,"ph":6.5,"rainfall":120,
+  "season":"monsoon","previous_crop":"wheat","irrigation":"canal","top_k":3
+}'
+```
+
+### Files
+- Training: `ml_service/train_xgb.py`
+- Service: `ml_service/app.py`
+- Docker: `ml_service/Dockerfile`
+- Requirements: `ml_service/requirements.txt`
+- Sample data: `data/sample_crops.csv`
+- Express controller: `backend/express/controllers/cropRecommendationController.js`
+- Mongoose model: `backend/express/models/CropRecommendation.js`
+- Route: `backend/express/routes/cropRecommendationRoutes.js`
+- Fallback JSON: `backend/express/fallback/rule_based.json`
+
+### Node Integration
+Mount the route in your Express app:
+
+```javascript
+const cropRoutes = require('./routes/cropRecommendationRoutes');
+app.use('/api/crops', cropRoutes);
+```
+
+Environment:
+- `ML_ENDPOINT` default `http://localhost:8000/predict`
+
+### Tests
+
+Python tests:
+
+```bash
+pytest -q /workspace/ml_service/tests
+```
+
+Node tests:
+
+```bash
+cd /workspace/backend/express && npm i && npm test
+```
+
+### Why XGBoost/LightGBM
+Gradient-boosted trees excel on structured/tabular data with non-linear interactions and mixed feature types, delivering strong accuracy with small models and fast inference. They require minimal scaling/normalization and handle missing values gracefully compared with deep nets, making them ideal for on-device or microservice deployment.
+
+### Offline fallback for PWA
+Cache a compact rule set (season × region defaults, simple NPK thresholds) and recent successful recommendations locally. When offline or ML times out, use heuristics (e.g., if rainfall>120 and season=monsoon ⇒ prioritize rice/maize) blended with cached regional priors; sync usage stats to the server when connectivity returns.
+
+### Replace dataset with Kaggle
+Download and place your CSV at `/workspace/data/crops.csv` with columns: `N,P,K,temperature,humidity,ph,rainfall,season,previous_crop,irrigation,label`. Then run:
+
+```bash
+python /workspace/ml_service/train_xgb.py --data /workspace/data/crops.csv --out /workspace/ml_service/artifacts
+```
+
+### Run Commands
+- Train: `python train_xgb.py`
+- Docker build: `docker build -t agri-ml .`
+- Docker run: `docker run -p 8000:8000 agri-ml`
+
 # Advaya Website
 
 ## Project Overview
